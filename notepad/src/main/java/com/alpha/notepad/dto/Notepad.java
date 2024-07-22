@@ -1,5 +1,7 @@
 package com.alpha.notepad.dto;
 
+import java.util.Objects;
+
 public class Notepad {
 
 	private int notepadId;
@@ -47,8 +49,27 @@ public class Notepad {
 	// overridden toString()
 	@Override
 	public String toString() {
-		return "Id = " + notepadId + ", Title = " + notepadTitle + ", Content = "
+		return "Id = " + notepadId + "  ,  Title = " + notepadTitle + "  ,  Content = "
 				+ notepadContent;
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(notepadContent, notepadId, notepadTitle);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Notepad other = (Notepad) obj;
+		return Objects.equals(notepadContent, other.notepadContent) && notepadId == other.notepadId
+				&& Objects.equals(notepadTitle, other.notepadTitle);
+	}
+	
 
 }

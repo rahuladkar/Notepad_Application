@@ -8,8 +8,8 @@ import com.alpha.notepad.dto.Notepad;
 public class NotepadController {
 
 	static Scanner ip = new Scanner(System.in);
-	static NotepadDao nd = new NotepadDao();
-	static NotepadController nc = new NotepadController();
+	static NotepadDao dao = new NotepadDao();
+	static NotepadController controller = new NotepadController();
 
 	public void saveNote() {
 
@@ -23,7 +23,7 @@ public class NotepadController {
 		System.out.print("Enter the Notepad Content : ");
 		String content = ip.nextLine();
 
-		if (nd.saveNotepad(new Notepad(nid, title, content)) != null) {
+		if (dao.saveNotepad(new Notepad(nid, title, content)) != null) {
 			System.out.println("\nSaved Successfully...!");
 		} else {
 			System.out.println("\nSomethig went wrong...!");
@@ -35,30 +35,48 @@ public class NotepadController {
 
 		System.out.println("\n1. Update Title");
 		System.out.println("2. Update Content");
+		System.out.println("3. Update Title and Content");
+
 		System.out.print("\nselect option : ");
 		int choice = ip.nextInt();
 		ip.nextLine();
 
+		int id = 0;
+		String title = "";
+		String content = "";
+
 		switch (choice) {
 		case 1: {
 			System.out.print("\nEnter The Notepad ID : ");
-			int id = ip.nextInt();
+			id = ip.nextInt();
 			ip.nextLine();
 			System.out.print("Enter The new Notepad Title : ");
-			String title = ip.nextLine();
-			System.out.println("\n" + nd.updateNotepad(new Notepad(id, title, null)));
+			title = ip.nextLine();
+			System.out.println("\n" + dao.updateNotepad(new Notepad(id, title, null)));
 		}
 			break;
 
 		case 2: {
 			System.out.print("\nEnter The Notepad ID : ");
-			int id = ip.nextInt();
+			id = ip.nextInt();
 			ip.nextLine();
-			System.out.print("Enter The Notepad Content : ");
-			String content = ip.nextLine();
-			System.out.println("\n" + nd.updateNotepad(new Notepad(id, null, content)));
+			System.out.print("Enter The new Notepad Content : ");
+			content = ip.nextLine();
+			System.out.println("\n" + dao.updateNotepad(new Notepad(id, null, content)));
 		}
 			break;
+
+		case 3: {
+			System.out.print("\nEnter The Notepad ID : ");
+			id = ip.nextInt();
+			ip.nextLine();
+			System.out.print("Enter The new Notepad Title : ");
+			title = ip.nextLine();
+			System.out.print("Enter The new Notepad Content : ");
+			content = ip.nextLine();
+			System.out.println("\n" + dao.updateNotepad(new Notepad(id, title, content)));
+		}
+
 		default:
 			throw new IllegalArgumentException("Unexpected value");
 		}
@@ -70,9 +88,9 @@ public class NotepadController {
 		System.out.print("\nEnter the Notepad ID : ");
 		int id = ip.nextInt();
 
-		if (nd.findNotepadById(id) != null) {
-			System.out.println("\n" + nd.findNotepadById(id));
-		}else{
+		if (dao.findNotepadById(id) != null) {
+			System.out.println("\n" + dao.findNotepadById(id));
+		} else {
 			System.out.println("\nRecord Not Found...!");
 		}
 
@@ -81,7 +99,7 @@ public class NotepadController {
 	public void findAll() {
 
 		System.out.println("\n--------------------------- All NotePad Records ---------------------------\n");
-		nd.findAll().forEach(System.out::println);
+		dao.findAll().forEach(System.out::println);
 
 	}
 
@@ -90,8 +108,10 @@ public class NotepadController {
 		System.out.print("\nEnter the Notepad ID : ");
 		int id = ip.nextInt();
 
-		if (nd.deleteById(id)) {
+		if (dao.deleteById(id)) {
 			System.out.println("\nSuccessfully Deleted...!");
+		} else {
+			System.out.println("\nNot Deleted...!");
 		}
 	}
 
@@ -113,19 +133,19 @@ public class NotepadController {
 
 			switch (choice) {
 			case 1:
-				nc.saveNote();
+				controller.saveNote();
 				break;
 			case 2:
-				nc.updateNote();
+				controller.updateNote();
 				break;
 			case 3:
-				nc.findById();
+				controller.findById();
 				break;
 			case 4:
-				nc.findAll();
+				controller.findAll();
 				break;
 			case 5:
-				nc.deleteById();
+				controller.deleteById();
 				break;
 			case 0:
 				System.out.println("\nBye.....!");

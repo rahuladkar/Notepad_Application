@@ -10,39 +10,32 @@ import java.util.List;
 
 import javax.naming.spi.DirStateFactory.Result;
 
+import com.alpha.connection_pool.ConnectionPool;
 import com.alpha.notepad.dto.Notepad;
 
 public class NotepadDao {
 
-	final private static String url = "jdbc:postgresql://localhost:5432/eca_jdbc";
-	final private static String user = "postgres";
-	final private static String password = "root";
-	static Connection conn = null;
-
-	static {
-		try {
-			Class.forName("org.postgresql.Driver");
-			conn = DriverManager.getConnection(url, user, password);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		}
-
-	}
-
 	public Notepad saveNotepad(Notepad np) {
-		
+
+		Connection conn = null;
 		try {
+			conn = ConnectionPool.getConnectionObject();
 			PreparedStatement pstm = conn.prepareStatement("insert into notepad values(?,?,?)");
 			pstm.setInt(1, np.getNotepadId());
 			pstm.setString(2, np.getNotepadTitle());
 			pstm.setString(3, np.getNotepadContent());
 
-			if(pstm.execute()==false) {
+			if (pstm.execute() == false) {
 				return np;
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+
+			if (conn != null) {
+				ConnectionPool.recieveConnection(conn);
+			}
 		}
 
 		return null;
@@ -50,7 +43,9 @@ public class NotepadDao {
 
 	public Notepad updateNotepad(Notepad np) {
 
+		Connection conn = null;
 		try {
+			conn = ConnectionPool.getConnectionObject();
 
 			if (np.getNotepadTitle() != null) {
 				PreparedStatement pstm = conn
@@ -66,12 +61,24 @@ public class NotepadDao {
 				pstm.setInt(2, np.getNotepadId());
 				pstm.execute();
 
+			} else {
+				PreparedStatement pstm = conn.prepareStatement(
+						"update notepad set notepad_title=? , notepad_content=? where notepad_id = ?");
+				pstm.setString(1, np.getNotepadTitle());
+				pstm.setString(2, np.getNotepadContent());
+				pstm.setInt(3, np.getNotepadId());
+				pstm.execute();
 			}
 
 			return findNotepadById(np.getNotepadId());
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+
+			if (conn != null) {
+				ConnectionPool.recieveConnection(conn);
+			}
 		}
 
 		return null;
@@ -80,7 +87,10 @@ public class NotepadDao {
 
 	public Notepad findNotepadById(int id) {
 
+		Connection conn = null;
 		try {
+			conn = ConnectionPool.getConnectionObject();
+
 			PreparedStatement pstm = conn.prepareStatement("select * from notepad where notepad_id=?");
 			pstm.setInt(1, id);
 
@@ -92,6 +102,11 @@ public class NotepadDao {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+
+			if (conn != null) {
+				ConnectionPool.recieveConnection(conn);
+			}
 		}
 
 		return null;
@@ -101,8 +116,12 @@ public class NotepadDao {
 
 		ArrayList<Notepad> data = new ArrayList<Notepad>();
 
+		Connection conn = null;
+
 		try {
-			PreparedStatement pstm = conn.prepareStatement("select * from notepad");
+			conn = ConnectionPool.getConnectionObject();
+
+			PreparedStatement pstm = conn.prepareStatement("select * from notepad order by notepad_id");
 
 			ResultSet rs = pstm.executeQuery();
 
@@ -114,6 +133,11 @@ public class NotepadDao {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+
+			if (conn != null) {
+				ConnectionPool.recieveConnection(conn);
+			}
 		}
 
 		return data;
@@ -121,7 +145,10 @@ public class NotepadDao {
 
 	public boolean deleteById(int id) {
 
+		Connection conn = null;
 		try {
+			conn = ConnectionPool.getConnectionObject();
+
 			PreparedStatement pstm = conn.prepareStatement("delete from notepad where notepad_id=?");
 
 			pstm.setInt(1, id);
@@ -132,6 +159,11 @@ public class NotepadDao {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+
+			if (conn != null) {
+				ConnectionPool.recieveConnection(conn);
+			}
 		}
 
 		return false;
